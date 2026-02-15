@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RCC Beam Designer</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+
+<div class="header">RCC BEAM DESIGN SOFTWARE</div>
+
+<div class="main">
+
+    <!-- INPUT PANEL -->
+    <div class="card input-panel">
+        <h2>Beam Inputs</h2>
+
+        <input id="moment" placeholder="Factored Moment (kNm)">
+        <input id="shear" placeholder="Shear Force (kN)">
+        <input id="width" placeholder="Beam Width (mm)">
+        <input id="fck" placeholder="Concrete Grade (fck)">
+        <input id="fy" placeholder="Steel Grade (fy)">
+        <input id="clear_cover" placeholder="Clear Cover (mm)">
+        <input id="side_cover" placeholder="Side Cover (mm)">
+        <input id="bar_dia" placeholder="Max Bar Dia (mm)">
+        <input id="agg" placeholder="Aggregate Size (mm)">
+
+        <button onclick="designBeam()">Design Beam</button>
+    </div>
+
+    <!-- RESULT PANEL -->
+    <div class="card result-panel">
+        <h2>Design Results</h2>
+        <div id="result">Click Design Beam to generate results</div>
+    </div>
+
+</div>
+
+<script>
+function designBeam(){
+
+    let data = {
+        moment: moment.value,
+        shear: shear.value,
+        width: width.value,
+        fck: fck.value,
+        fy: fy.value,
+        clear_cover: clear_cover.value,
+        side_cover: side_cover.value,
+        bar_dia: bar_dia.value,
+        agg: agg.value
+    }
+
+    fetch("/design",{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(data)
+    })
+    .then(res=>res.json())
+    .then(data=>{
+        document.getElementById("result").innerHTML =
+        `<table>
+            <tr><th>Parameter</th><th>Value</th></tr>
+            <tr><td>Overall Depth</td><td>${data.depth} mm</td></tr>
+            <tr><td>Effective Depth</td><td>${data.effective_depth} mm</td></tr>
+            <tr><td>Ast Required</td><td>${data.Ast_req} mm²</td></tr>
+            <tr><td>Ast Provided</td><td>${data.Ast_prov} mm²</td></tr>
+            <tr><td>Xu</td><td>${data.Xu} mm</td></tr>
+            <tr><td>Xu Lim</td><td>${data.Xu_lim} mm</td></tr>
+            <tr><td>Stirrups</td><td>${data.shear_dia} mm</td></tr>
+            <tr><td>Legs</td><td>${data.legs}</td></tr>
+            <tr><td>Spacing</td><td>${data.spacing} mm</td></tr>
+        </table>`;
+    });
+}
+</script>
+
+</body>
+</html>
