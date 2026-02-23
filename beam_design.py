@@ -138,11 +138,11 @@ def design_beam(data):
     fy=float(data["fy"])
     clear_cover=float(data["clear_cover"])
     side_cover=float(data["side_cover"])
-    Max_bar_dia=float(data["bar_dia"])
-    aggregate_size=float(data["agg"])
     factored_shear_force=float(data["shear"])
 
     diameters=[20,16,12,10]
+    aggregate_size=12
+    Max_bar_dia=max(diameters)  
     D_given=0
 
     D_roundedoff,d_effective,A_st,distribution,Ast_provided,layers,combo,Xu,Xu_lim,d = bending_design(

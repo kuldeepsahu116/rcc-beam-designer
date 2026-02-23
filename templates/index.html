@@ -22,8 +22,6 @@
         <input id="fy" placeholder="Steel Grade (fy)">
         <input id="clear_cover" placeholder="Clear Cover (mm)">
         <input id="side_cover" placeholder="Side Cover (mm)">
-        <input id="bar_dia" placeholder="Max Bar Dia (mm)">
-        <input id="agg" placeholder="Aggregate Size (mm)">
 
         <button onclick="designBeam()">Design Beam</button>
     </div>
@@ -46,9 +44,7 @@ function designBeam(){
         fck: fck.value,
         fy: fy.value,
         clear_cover: clear_cover.value,
-        side_cover: side_cover.value,
-        bar_dia: bar_dia.value,
-        agg: agg.value
+        side_cover: side_cover.value
     }
 
     fetch("/design",{
