@@ -1,83 +1,245 @@
+/* ------------------------------
+   GLOBAL
+------------------------------ */
+
+*{
+    box-sizing:border-box;
+}
+
 body{
     margin:0;
-    font-family: "Segoe UI", Arial;
+    font-family:Segoe UI, Roboto, Arial, sans-serif;
     background:#eef2f7;
+    color:#222;
 }
 
-/* HEADER */
+/* ------------------------------
+   HEADER
+------------------------------ */
+
 .header{
-    background:#0f172a;
+    background:linear-gradient(90deg,#1f3c88,#2952cc);
     color:white;
-    padding:18px;
-    font-size:22px;
+    padding:22px;
     text-align:center;
-    font-weight:bold;
+    font-size:22px;
+    font-weight:600;
+    letter-spacing:1px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* MAIN GRID */
-.main{
-    display:flex;
-    gap:20px;
-    padding:25px;
+/* ------------------------------
+   MAIN CONTAINER
+------------------------------ */
+
+.container{
+max-width:1400px;
+margin:40px auto;
+display:flex;
+justify-content:center;
+align-items:flex-start;
+gap:40px;
+flex-wrap:wrap;
 }
 
-/* CARD STYLE */
+/* ------------------------------
+   CARD
+------------------------------ */
+
 .card{
     background:white;
-    padding:20px;
-    border-radius:12px;
-    box-shadow:0 5px 15px rgba(0,0,0,0.1);
+    padding:30px;
+    border-radius:14px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.08);
+    width:520px;
+    transition:0.3s ease;
 }
 
-/* INPUT PANEL */
-.input-panel{
-    width:40%;
+.card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 14px 30px rgba(0,0,0,0.12);
 }
 
-/* RESULT PANEL */
-.result-panel{
-    width:60%;
+h2{
+    margin-top:0;
+    margin-bottom:20px;
+    color:#1f3c88;
+    font-weight:600;
 }
 
-/* INPUTS */
-input{
-    width:100%;
-    padding:12px;
-    margin:8px 0;
-    border-radius:6px;
-    border:1px solid #ccc;
+/* ------------------------------
+   INPUT GRID
+------------------------------ */
+
+.input-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    column-gap:18px;
+    row-gap:14px;
 }
 
-/* BUTTON */
+/* ------------------------------
+   INPUT GROUP
+------------------------------ */
+
+.input-group{
+width:100%;
+display:flex;
+flex-direction:column;
+gap:5px;
+}
+
+.input-group label{
+font-size:13px;
+font-weight:600;
+color:#2c3e80;
+}
+
+.input-group input,
+.input-group select{
+padding:11px 12px;
+border:1px solid #d0d6e2;
+border-radius:8px;
+font-size:14px;
+transition:0.2s;
+background:white;
+}
+
+.input-group input:focus,
+.input-group select:focus{
+border-color:#2952cc;
+outline:none;
+box-shadow:0 0 0 2px rgba(41,82,204,0.15);
+}
+
+/* ------------------------------
+   BUTTON
+------------------------------ */
+
 button{
-    width:100%;
-    padding:14px;
-    margin-top:10px;
-    background:#2563eb;
-    color:white;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
-    cursor:pointer;
+margin-top:20px;
+padding:12px 30px;
+background:linear-gradient(90deg,#1f3c88,#2952cc);
+color:white;
+border:none;
+border-radius:8px;
+font-size:15px;
+font-weight:600;
+cursor:pointer;
+display:block;
+margin-left:auto;
+margin-right:auto;
 }
 
 button:hover{
-    background:#1d4ed8;
+    background:linear-gradient(90deg,#162e66,#1f3c88);
+    transform:scale(1.02);
 }
 
-/* RESULT TABLE */
-table{
+/* ------------------------------
+   RESULT PLACEHOLDER
+------------------------------ */
+
+.result-placeholder{
+    text-align:center;
+    color:#888;
+    padding:40px 0;
+    font-size:14px;
+}
+
+/* ------------------------------
+   RESULT GRID (NEW)
+------------------------------ */
+
+.result-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:20px;
+}
+
+.result-card{
+    background:#ffffff;
+    border-radius:10px;
+    overflow:hidden;
+    box-shadow:0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* ------------------------------
+   RESULT TABLE
+------------------------------ */
+
+.result-table{
     width:100%;
     border-collapse:collapse;
-    margin-top:15px;
+    font-size:14px;
 }
 
-th,td{
-    padding:12px;
-    border-bottom:1px solid #ddd;
-}
-
-th{
-    background:#2563eb;
+.result-table th{
+    background:linear-gradient(90deg,#1f3c88,#2952cc);
     color:white;
+    padding:10px;
+    text-align:center;
+    font-weight:600;
+    letter-spacing:0.5px;
+}
+
+.result-table td{
+    padding:10px;
+    border-bottom:1px solid #edf0f6;
+}
+
+.result-table tr:nth-child(even){
+    background:#f8f9fc;
+}
+
+.result-table tr:hover{
+    background:#eef3ff;
+}
+
+/* ------------------------------
+   SECTION HEADINGS INSIDE TABLE
+------------------------------ */
+
+.result-table th[colspan="2"]{
+    font-size:15px;
+}
+
+/* ------------------------------
+   PASS / FAIL COLORS
+------------------------------ */
+
+.pass{
+    color:#0a8f3c;
+    font-weight:600;
+}
+
+.fail{
+    color:#d62828;
+    font-weight:600;
+}
+
+/* ------------------------------
+   RESPONSIVE DESIGN
+------------------------------ */
+
+@media(max-width:950px){
+
+    .container{
+        flex-direction:column;
+        align-items:center;
+    }
+
+    .card{
+        width:100%;
+        max-width:600px;
+    }
+
+    .input-grid{
+        grid-template-columns:1fr;
+    }
+
+    .result-grid{
+        grid-template-columns:1fr;
+    }
+
 }

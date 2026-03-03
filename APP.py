@@ -9,9 +9,11 @@ def home():
 
 @app.route("/design", methods=["POST"])
 def design():
-    data = request.json            # data coming from HTML (JavaScript)
-    result = design_beam(data)     # calling your RCC code
-    return jsonify(result)         # sending result back to UI
+
+    data = request.get_json()
+    result = design_beam(data)
+
+    return jsonify(result)        # sending result back to UI
 
 if __name__ == "__main__":
     app.run(debug=True)

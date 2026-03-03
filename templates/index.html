@@ -3,38 +3,92 @@
 <head>
 <title>RCC Beam Designer</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
 
-<div class="header">RCC BEAM DESIGN SOFTWARE</div>
+<div class="header">
+    RCC BEAM DESIGNER
+</div>
 
-<div class="main">
+<div class="container">
 
     <!-- INPUT PANEL -->
     <div class="card input-panel">
         <h2>Beam Inputs</h2>
 
-        <input id="moment" placeholder="Factored Moment (kNm)">
-        <input id="shear" placeholder="Shear Force (kN)">
-        <input id="width" placeholder="Beam Width (mm)">
-        <input id="fck" placeholder="Concrete Grade (fck)">
-        <input id="fy" placeholder="Steel Grade (fy)">
-        <input id="clear_cover" placeholder="Clear Cover (mm)">
-        <input id="side_cover" placeholder="Side Cover (mm)">
+        <div class="input-group">
+        <label>Factored Moment (kNm)</label>
+        <input id="moment" type="number">
+        </div>
 
-        <button onclick="designBeam()">Design Beam</button>
+        <div class="input-group">
+        <label>Factored Shear (kN)</label>
+        <input id="shear" type="number">
+        </div>
+
+        <div class="input-group">
+        <label>Beam Width (mm)</label>
+        <input id="width" type="number">
+        </div>
+
+        <div class="input-group">
+        <label>Concrete Grade</label>
+        <select id="fck">
+        <option value="10">M10</option>
+        <option value="15">M15</option>
+        <option value="20">M20</option>
+        <option value="25">M25</option>
+        <option value="30">M30</option>
+        <option value="35">M35</option>
+        <option value="40">M40</option>
+        <option value="45">M45</option>
+        <option value="50">M50</option>
+        <option value="55">M55</option>
+        <option value="60">M60</option>
+        </select>
+        </div>
+
+        <div class="input-group">
+        <label>Steel Grade</label>
+        <select id="fy">
+        <option value="250">Fe250</option>
+        <option value="415">Fe415</option>
+        <option value="500">Fe500</option>
+        <option value="550">Fe550</option>
+        </select>
+        </div>
+
+        <div class="input-group">
+        <label>Clear Cover (mm)</label>
+        <input id="clear_cover" type="number">
+        </div>
+
+        <div class="input-group">
+        <label>Side Cover (mm)</label>
+        <input id="side_cover" type="number">
+        </div>
+
+
+        <!-- BUTTON MUST BE INSIDE THE CARD -->
+        <button onclick="designBeam()">DESIGN BEAM</button>
+
     </div>
 
     <!-- RESULT PANEL -->
     <div class="card result-panel">
         <h2>Design Results</h2>
-        <div id="result">Click Design Beam to generate results</div>
+        <div id="result" class="result-placeholder">
+            Enter inputs and click DESIGN BEAM
+        </div>
     </div>
 
 </div>
 
+
 <script>
+
 function designBeam(){
 
     let data = {
@@ -54,21 +108,77 @@ function designBeam(){
     })
     .then(res=>res.json())
     .then(data=>{
+
+        let reinforcementHTML = "";
+
+        if(data.layers && data.distribution){
+
+            reinforcementHTML += 
+            `<tr><th colspan="2">TENSION REINFORCEMENT</th></tr>`;
+
+           for(let i = data.layers - 1; i >= 0; i--){
+
+                let layerNumber = data.layers - i;
+
+                reinforcementHTML += 
+                `<tr>
+                    <td>Layer ${layerNumber}</td>
+                    <td>${formatBars(data.distribution[i])}</td>
+                </tr>`;
+            }
+        }
+
         document.getElementById("result").innerHTML =
-        `<table>
-            <tr><th>Parameter</th><th>Value</th></tr>
-            <tr><td>Overall Depth</td><td>${data.depth} mm</td></tr>
-            <tr><td>Effective Depth</td><td>${data.effective_depth} mm</td></tr>
-            <tr><td>Ast Required</td><td>${data.Ast_req} mm²</td></tr>
-            <tr><td>Ast Provided</td><td>${data.Ast_prov} mm²</td></tr>
-            <tr><td>Xu</td><td>${data.Xu} mm</td></tr>
-            <tr><td>Xu Lim</td><td>${data.Xu_lim} mm</td></tr>
-            <tr><td>Stirrups</td><td>${data.shear_dia} mm</td></tr>
-            <tr><td>Legs</td><td>${data.legs}</td></tr>
-            <tr><td>Spacing</td><td>${data.spacing} mm</td></tr>
-        </table>`;
+        `
+        <div class="result-grid">
+
+            <div class="result-card">
+                <table class="result-table">
+                    <tr><th colspan="2">BENDING DESIGN</th></tr>
+                    <tr><td>Overall Depth</td><td>${data.depth} mm</td></tr>
+                    <tr><td>Effective Depth</td><td>${data.effective_depth} mm</td></tr>
+                    <tr><td>Ast Required</td><td>${data.Ast_req} mm²</td></tr>
+                    <tr><td>Ast Provided</td><td>${data.Ast_prov} mm²</td></tr>
+                    <tr><td>Xu</td><td>${data.Xu} mm</td></tr>
+                    <tr><td>Xu Limit</td><td>${data.Xu_lim} mm</td></tr>
+                </table>
+            </div>
+
+            <div class="result-card">
+                <table class="result-table">
+
+                    ${reinforcementHTML}
+
+                    <tr><th colspan="2">SHEAR REINFORCEMENT</th></tr>
+                    <tr><td>Stirrup Diameter</td><td>${data.shear_dia} mm</td></tr>
+                    <tr><td>No. of Legs</td><td>${data.legs}</td></tr>
+                    <tr><td>Spacing</td><td>${data.spacing} mm c/c</td></tr>
+
+                </table>
+            </div>
+
+        </div>
+        `;
     });
 }
+
+function formatBars(barArray){
+
+    let countMap = {};
+
+    barArray.forEach(dia => {
+        countMap[dia] = (countMap[dia] || 0) + 1;
+    });
+
+    let result = "";
+
+    for(let dia in countMap){
+        result += countMap[dia] + " Bars of " + dia + "mm<br>";
+    }
+
+    return result;
+}
+
 </script>
 
 </body>

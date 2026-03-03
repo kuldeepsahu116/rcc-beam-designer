@@ -155,13 +155,30 @@ def design_beam(data):
         factored_shear_force,Ast_percent,fck,fy,width,d_effective)
 
     return {
-        "depth":D_roundedoff,
-        "effective_depth":d_effective,
-        "Ast_req":A_st,
-        "Ast_prov":Ast_provided,
-        "Xu":Xu,
-        "Xu_lim":Xu_lim,
-        "shear_dia":Shear_bar_dia,
-        "legs":No_of_legs,
-        "spacing":Sv
+        "depth": D_roundedoff,
+        "effective_depth": d_effective,
+        "Ast_req": A_st,
+        "Ast_prov": Ast_provided,
+        "Xu": Xu,
+        "Xu_lim": Xu_lim,
+        "shear_dia": Shear_bar_dia,
+        "legs": No_of_legs,
+        "spacing": Sv,
+        "layers": layers,
+        "distribution": distribution
     }
+
+if __name__ == "__main__":
+    # Example input data
+    data = {
+        "moment": 200,          # in Knm
+        "width": 250,           # in mm
+        "fck": 30,
+        "fy": 415,
+        "clear_cover": 30,      # in mm
+        "side_cover": 20,       # in mm
+        "shear": 200           # in KN
+    }
+
+    result = design_beam(data)
+    print(result)
