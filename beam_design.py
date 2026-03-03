@@ -160,7 +160,7 @@ def design_beam(data):
         "Ast_req": A_st,
         "Ast_prov": Ast_provided,
         "Xu": Xu,
-        "Xu_lim": Xu_lim,
+        "Xu_lim": round(Xu_lim,2),
         "shear_dia": Shear_bar_dia,
         "legs": No_of_legs,
         "spacing": Sv,

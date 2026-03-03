@@ -33,13 +33,11 @@ body{
 ------------------------------ */
 
 .container{
-max-width:1400px;
-margin:40px auto;
-display:flex;
-justify-content:center;
-align-items:flex-start;
-gap:40px;
-flex-wrap:wrap;
+    width: 90%;
+    margin:40px auto;
+    display:flex;
+    align-items:flex-start;
+    gap:40px;
 }
 
 /* ------------------------------
@@ -51,8 +49,14 @@ flex-wrap:wrap;
     padding:30px;
     border-radius:14px;
     box-shadow:0 10px 25px rgba(0,0,0,0.08);
-    width:520px;
     transition:0.3s ease;
+}
+.input-panel{
+    flex: 0 0 30%;
+}
+
+.result-panel{
+    flex: 0 0 70%;
 }
 
 .card:hover{
@@ -83,33 +87,34 @@ h2{
 ------------------------------ */
 
 .input-group{
-width:100%;
-display:flex;
-flex-direction:column;
-gap:5px;
-}
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    }
 
 .input-group label{
-font-size:13px;
-font-weight:600;
-color:#2c3e80;
+    font-size:13px;
+    font-weight:600;
+    color:#2c3e80;
 }
 
 .input-group input,
 .input-group select{
-padding:11px 12px;
-border:1px solid #d0d6e2;
-border-radius:8px;
-font-size:14px;
-transition:0.2s;
-background:white;
+    padding:11px 12px;
+    border:1px solid #d0d6e2;
+    border-radius:8px;
+    font-size:14px;
+    transition:0.2s;
+    background:white;
+    cursor:pointer;
 }
 
 .input-group input:focus,
 .input-group select:focus{
-border-color:#2952cc;
-outline:none;
-box-shadow:0 0 0 2px rgba(41,82,204,0.15);
+    border-color:#2952cc;
+    outline:none;
+    box-shadow:0 0 0 2px rgba(41,82,204,0.15);
 }
 
 /* ------------------------------
@@ -117,18 +122,18 @@ box-shadow:0 0 0 2px rgba(41,82,204,0.15);
 ------------------------------ */
 
 button{
-margin-top:20px;
-padding:12px 30px;
-background:linear-gradient(90deg,#1f3c88,#2952cc);
-color:white;
-border:none;
-border-radius:8px;
-font-size:15px;
-font-weight:600;
-cursor:pointer;
-display:block;
-margin-left:auto;
-margin-right:auto;
+    margin-top:20px;
+    padding:12px 30px;
+    background:linear-gradient(90deg,#1f3c88,#2952cc);
+    color:white;
+    border:none;
+    border-radius:8px;
+    font-size:15px;
+    font-weight:600;
+    cursor:pointer;
+    display:block;
+    margin-left:auto;
+    margin-right:auto;
 }
 
 button:hover{
@@ -229,9 +234,9 @@ button:hover{
         align-items:center;
     }
 
-    .card{
-        width:100%;
-        max-width:600px;
+    .input-panel,
+    .result-panel{
+        flex: 0 0 100%;
     }
 
     .input-grid{
