@@ -23,15 +23,33 @@ from shear_stress import get_tau_c
 # Bending Design function
 #-------------------------------------------
  
-def Calc(factoredmoment,width,fck,fy,side_cover,aggregate_size,diameters,d_effective,Xulim_by_d,D_roundedoff):
+def Calc(factoredmoment,width,fck,fy,side_cover,clear_cover,aggregate_size,diameters,Xulim_by_d,D_roundedoff):
+    Max_bar_dia=max(diameters)
+    d_effective=D_roundedoff-clear_cover-Max_bar_dia/2
     A_st=round((-((-1)*0.87*fy*d_effective) - math.sqrt(((-1)*0.87*fy*d_effective)**2 - 4*((0.87*(fy**2)/(width*fck))*factoredmoment*1000000))) / (2*0.87*(fy**2)/(width*fck)),2)
     A_st_min=0.85*width*d_effective/fy
 
     if A_st<A_st_min:
         A_st=A_st_min
 
+    def filter_diameters(Ast_required, diameters):
 
-    combo, ast, distribution, layers = min_ast_by_bars_required(A_st, width, side_cover, aggregate_size,diameters)
+        if Ast_required > 7000:
+            min_dia = 25
+        elif Ast_required > 4000:
+            min_dia = 20
+        elif Ast_required > 2000:
+            min_dia = 16
+        elif Ast_required > 800:
+            min_dia = 12
+        else:
+            min_dia = 10
+
+        return [d for d in diameters if d >= min_dia]
+    
+    allowed_diameters = filter_diameters(A_st, diameters)
+
+    combo, ast, distribution, layers = min_ast_by_bars_required(A_st, width, side_cover, aggregate_size,allowed_diameters)
     Ast_provided=round(ast,2)
     Xu_lim=Xulim_by_d*d_effective
     Xu=round((0.87*fy*Ast_provided)/(0.36*fck*width),2)
@@ -43,36 +61,39 @@ def Calc(factoredmoment,width,fck,fy,side_cover,aggregate_size,diameters,d_effec
 def bending_design(factoredmoment,width,fck,fy,clear_cover,side_cover,Max_bar_dia,aggregate_size,diameters,D_given):
     
     Xulim_by_d=round(0.0035/((0.87*fy/200000)+0.0055),2)
+    # print(f"Xulim/d = {Xulim_by_d}")
     Q_max=round(0.36*fck*Xulim_by_d*(1-0.42*Xulim_by_d),2)
-    d=round((factoredmoment*1000000/(Q_max*width))**0.5,0)
+    # print(f"Qmax = {Q_max} N/mm²")
+    d=(factoredmoment*1000000/(Q_max*width))**0.5
+    # print(f"Required depth (d) = {d} mm")
     D=d+clear_cover+Max_bar_dia/2
+    # print(f"Calculated overall depth (D) = {D} mm")
     if D_given==0 :
         D_roundedoff=max(round(D,-1),round(D+5,-1))
     else:
         D_roundedoff=D_given
-
+    # print(f"Rounded overall depth (D_roundedoff) = {D_roundedoff} mm")
     d_effective=D_roundedoff-clear_cover-Max_bar_dia/2
+    # print(f"Effective depth (d_effective) = {d_effective} mm")
     Mu_lim=Q_max*width*(d_effective**2)
+    # print(f"Limiting moment capacity (Mu_lim) = {Mu_lim/1000000} Knm")
 
     
-    if factoredmoment*1000000<Mu_lim:
+    if factoredmoment*1000000<=Mu_lim:
     
-        Xu,Xu_lim,d_effective,A_st,distribution,Ast_provided,combo,layers= Calc(factoredmoment,width,fck,fy,side_cover,aggregate_size,diameters,d_effective,Xulim_by_d,D_roundedoff)
+        Xu,Xu_lim,d_effective,A_st,distribution,Ast_provided,combo,layers= Calc(factoredmoment,width,fck,fy,side_cover,clear_cover,aggregate_size,diameters,Xulim_by_d,D_roundedoff)
     
         # for doubly design we need to focus here for singly it is ok but if we limit the depth and Xu exceeds the limit it we fail
-        if Xu>Xu_lim and D_given==0:
+        while Xu>Xu_lim and D_given==0:
             D_roundedoff+=10
             Xu,Xu_lim,d_effective,A_st,distribution,Ast_provided,combo,layers= Calc(
-                factoredmoment,width,fck,fy,side_cover,aggregate_size,diameters,d_effective,Xulim_by_d,D_roundedoff)
-            return D_roundedoff,d_effective,A_st,distribution,Ast_provided,layers,combo,Xu,Xu_lim,d
+                factoredmoment,width,fck,fy,side_cover,clear_cover,aggregate_size,diameters,Xulim_by_d,D_roundedoff)
         if Xu>Xu_lim and D_given!=0:
-            print ("error-Depth taken is not sufficient")
-            return 0,0,0,0,0,0,0,0,0,0
-        else:
-            return D_roundedoff,d_effective,A_st,distribution,Ast_provided,layers,combo,Xu,Xu_lim,d
+            raise ValueError("Provided depth is insufficient for singly reinforced design.")
+        
+        return D_roundedoff,d_effective,A_st,distribution,Ast_provided,layers,combo,Xu,Xu_lim
     else:
-            print ("error-doubly design required")
-            return 0,0,0,0,0,0,0,0,0,0
+        raise ValueError("Section exceeds limiting moment capacity. Doubly reinforced design required.")
 
 
 #-------------------------------------------
@@ -90,7 +111,7 @@ def Shear_spacing(factored_shear_force,fy,width,d_effective,tau_c,tau_c_max,tau_
             S=math.floor(min(sv,(0.87*fy*A_sv*d_effective/((factored_shear_force*1000)-(tau_c*width*d_effective))))/5)*5
 
     else:
-        S=0
+        raise ValueError("Shear force exceeds maximum shear capacity. Increase beam depth or width.")
     return S
 
 
@@ -122,7 +143,7 @@ def Shear_design(factored_shear_force,Ast_percent,fck,fy,width,d_effective):
         if Sv >= MIN_SPACING:
             return dia, 4, Sv
 
-    return 0,0,0
+    raise ValueError("Suitable stirrup configuration not found. Increase beam depth or width.")
 
 
 #-------------------------------------------
@@ -140,12 +161,42 @@ def design_beam(data):
     side_cover=float(data["side_cover"])
     factored_shear_force=float(data["shear"])
 
-    diameters=[20,16,12,10]
-    aggregate_size=12
-    Max_bar_dia=max(diameters)  
+     # 🔴 INPUT VALIDATION
+    if factoredmoment <= 0:
+        raise ValueError("Factored moment must be greater than zero.")
+
+    if factored_shear_force < 0:
+        raise ValueError("Factored shear force cannot be negative.")
+
+    if width <= 0:
+        raise ValueError("Beam width must be greater than zero.")
+
+    if clear_cover <= 0:
+        raise ValueError("Clear cover must be greater than zero.")
+
+    if side_cover < 0:
+        raise ValueError("Side cover cannot be negative.")
+    
+
+    def choose_bar_from_moment(factoredmoment):
+
+        if factoredmoment <= 50:
+            return 16
+        elif factoredmoment <= 150:
+            return 20
+        elif factoredmoment <= 500:
+            return 25
+        else:
+            return 32
+
+    Max_bar_dia = choose_bar_from_moment(factoredmoment)
+
+    diameters = [d for d in [32,25,20,16,12,10] if d <= Max_bar_dia]    
+
+    aggregate_size=12 
     D_given=0
 
-    D_roundedoff,d_effective,A_st,distribution,Ast_provided,layers,combo,Xu,Xu_lim,d = bending_design(
+    D_roundedoff,d_effective,A_st,distribution,Ast_provided,layers,combo,Xu,Xu_lim = bending_design(
         factoredmoment,width,fck,fy,clear_cover,side_cover,
         Max_bar_dia,aggregate_size,diameters,D_given)
 
@@ -171,11 +222,11 @@ def design_beam(data):
 if __name__ == "__main__":
     # Example input data
     data = {
-        "moment": 200,          # in Knm
-        "width": 250,           # in mm
+        "moment": 300,          # in Knm
+        "width": 230,           # in mm
         "fck": 30,
-        "fy": 415,
-        "clear_cover": 30,      # in mm
+        "fy": 500,
+        "clear_cover": 20,      # in mm
         "side_cover": 20,       # in mm
         "shear": 200           # in KN
     }

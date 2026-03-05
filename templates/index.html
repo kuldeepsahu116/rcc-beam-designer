@@ -79,6 +79,12 @@
     <!-- RESULT PANEL -->
     <div class="card result-panel">
         <h2>Design Results</h2>
+
+        <div id="loading" class="loading-spinner" style="display:none;">
+        <div class="spinner"></div>
+            Calculating beam design...
+        </div>
+
         <div id="result" class="result-placeholder">
             Enter inputs and click DESIGN BEAM
         </div>
@@ -90,6 +96,9 @@
 <script>
 
 function designBeam(){
+
+    document.getElementById("loading").style.display = "block";
+    document.getElementById("result").innerHTML = "";
 
     let data = {
         moment: moment.value,
@@ -106,8 +115,26 @@ function designBeam(){
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify(data)
     })
-    .then(res=>res.json())
+    .then(res => {
+        if(!res.ok){
+            return res.json().then(err => { throw err })
+        }
+        return res.json()
+    })
     .then(data=>{
+
+        document.getElementById("loading").style.display = "none";
+
+        // ✅ HANDLE ERROR FIRST
+        if(data.error){
+            document.getElementById("result").innerHTML =
+            `
+            <div class="result-error">
+                ${data.error}
+            </div>
+            `;
+            return;
+        }
 
         let reinforcementHTML = "";
 
@@ -159,6 +186,12 @@ function designBeam(){
 
         </div>
         `;
+    })
+
+    .catch(err=>{
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("result").innerHTML =
+            `<div class="result-error">${err.error}</div>`;
     });
 }
 

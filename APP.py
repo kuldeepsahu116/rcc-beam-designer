@@ -21,11 +21,17 @@ def design():
             "clear_cover": float(raw["clear_cover"]),
             "side_cover": float(raw["side_cover"])
         }
-    except:
-        return jsonify({"error": "Invalid or empty input"}), 400
+        result = design_beam(data)
 
-    result = design_beam(data)
-    return jsonify(result)     # sending result back to UI
+        return jsonify(result)
+
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+
+    except Exception as e:
+        print(e)  # shows real error in terminal
+        return jsonify({"error": "Unexpected calculation error"}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=True)

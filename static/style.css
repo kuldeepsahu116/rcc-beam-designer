@@ -153,6 +153,32 @@ button:hover{
 }
 
 /* ------------------------------
+   loading spinner
+------------------------------ */
+
+.loading-spinner{
+    text-align:center;
+    margin-top:20px;
+    font-weight:500;
+}
+
+.spinner{
+    width:40px;
+    height:40px;
+    border:5px solid #ddd;
+    border-top:5px solid #0077ff;
+    border-radius:50%;
+    animation:spin 1s linear infinite;
+    margin:auto;
+    margin-bottom:10px;
+}
+
+@keyframes spin{
+    0%{transform:rotate(0deg);}
+    100%{transform:rotate(360deg);}
+}
+
+/* ------------------------------
    RESULT GRID (NEW)
 ------------------------------ */
 
@@ -167,6 +193,16 @@ button:hover{
     border-radius:10px;
     overflow:hidden;
     box-shadow:0 5px 15px rgba(0,0,0,0.05);
+}
+
+.result-error {
+    background-color: #ffe6e6;
+    color: #b30000;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #ff4d4d;
+    font-weight: 600;
+    text-align: center;
 }
 
 /* ------------------------------
